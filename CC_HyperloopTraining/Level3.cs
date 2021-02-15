@@ -5,20 +5,9 @@ using System.Linq;
 
 namespace CC_HyperloopTraining
 {
-    public class Program
+    public class Level3
     {
         private static World world;
-
-        private static void Main(string[] args)
-        {
-            while (true)
-            {
-                world = new World();
-                ReadInput();
-
-                OutputLevel3();
-            }
-        }
 
         private static void OutputLevel3()
         {

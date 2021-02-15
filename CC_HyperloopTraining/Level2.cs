@@ -5,24 +5,13 @@ using System.Linq;
 
 namespace CC_HyperloopTraining
 {
-    public class Program
+    public class Level2
     {
         private static World world;
 
-        private static void Main(string[] args)
+        private static void OutputLevel2()
         {
-            while (true)
-            {
-                world = new World();
-                ReadInput();
-
-                OutputLevel3();
-            }
-        }
-
-        private static void OutputLevel3()
-        {
-            PrintResult(string.Join(' ', world.TargetsNotBehindObstacle()));
+            PrintResult(string.Join(' ', world.TargetsInSameAreaAsStartPoint()));
         }
 
         private static void ReadInput()
@@ -32,21 +21,17 @@ namespace CC_HyperloopTraining
             var lines = File.ReadLines("C:\\temp\\input.txt").ToArray();
             var lineCounter = 0;
 
-            // obstacle
-            var obstacleString = lines[lineCounter++].Split(' ');
-            world.Obstacle = new Obstacle
+            var angle1String = lines[lineCounter++].Split(' ');
+            var angle2String = lines[lineCounter++].Split(' ');
+            world.Separators = (new Coordinates
             {
-                Start = new Coordinates
-                {
-                    X = int.Parse(obstacleString[0]),
-                    Y = int.Parse(obstacleString[2])
-                },
-                End = new Coordinates
-                {
-                    X = int.Parse(obstacleString[1]),
-                    Y = int.Parse(obstacleString[2])
-                }
-            };
+                X = int.Parse(angle1String[0]),
+                Y = int.Parse(angle1String[1])
+            }, new Coordinates
+            {
+                X = int.Parse(angle2String[0]),
+                Y = int.Parse(angle2String[1])
+            });
 
             var numberOfTargets = int.Parse(lines[lineCounter++]);
             for (int i = 0; i < numberOfTargets; i++)
@@ -86,10 +71,9 @@ namespace CC_HyperloopTraining
             public int[,] Map { get; set; }
             public Coordinates StartPoint { get; set; } = new Coordinates { X = 0, Y = 0 };
             public List<Coordinates> Targets { get; set; } = new List<Coordinates>();
+            //public int SeparatorY { get; set; } = 0;
 
             public (Coordinates first, Coordinates second) Separators;
-
-            public Obstacle Obstacle { get; set; }
 
             public List<Coordinates> TargetsInSameAreaAsStartPoint()
             {
@@ -105,40 +89,6 @@ namespace CC_HyperloopTraining
                 return Targets
                         .Where(t => Math.Atan2(t.Y, t.X) > angle1 || Math.Atan2(t.Y, t.X) < angle2).ToList();
             }
-
-            public List<Coordinates> TargetsNotBehindObstacle()
-            {
-                var angle1 = Math.Atan2(Obstacle.Start.Y, Obstacle.Start.X);
-                var angle2 = Math.Atan2(Obstacle.End.Y, Obstacle.End.X);
-
-                var result = new List<Coordinates>();
-
-                if (angle1 > 0)
-                {
-                    result = Targets.Where(t => Math.Atan2(t.Y, t.X) <= angle1 && Math.Atan2(t.Y, t.X) >= angle2).ToList();
-                }
-                else
-                {
-                    result = Targets.Where(t => Math.Atan2(t.Y, t.X) >= angle1 && Math.Atan2(t.Y, t.X) <= angle2).ToList();
-                }
-
-                if (StartPoint.Y < Obstacle.Start.Y)
-                {
-                    result = result.Where(t => t.Y > Obstacle.Start.Y).ToList();
-                }
-                else
-                {
-                    result = result.Where(t => t.Y < Obstacle.Start.Y).ToList();
-                }
-
-                return Targets.Except(result).ToList();
-            }
-        }
-
-        public class Obstacle
-        {
-            public Coordinates Start { get; set; }
-            public Coordinates End { get; set; }
         }
 
         public class Coordinates
